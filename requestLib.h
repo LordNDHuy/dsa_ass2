@@ -4,13 +4,13 @@
  * Author      : Duc Dung Nguyen
  * Email       : nddung@hcmut.edu.vn
  * Copyright   : Faculty of Computer Science and Engineering - Bach Khoa University
- * Description : library for Assignment 2 - Data structures and Algorithms - Fall 2017
+ * Description : Library for Assignment 2 - Data structures and Algorithms - Spring 2018
  *               This library contains functions used for event management
  * =========================================================================================
  */
 
-#ifndef DSA171A2_REQUESTLIB_H
-#define DSA171A2_REQUESTLIB_H
+#ifndef A02_REQUESTLIB_H
+#define A02_REQUESTLIB_H
 
 #include <iostream>
 #include <fstream>
@@ -24,30 +24,30 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#define REQUEST_CODE_SIZE     16
+#define REQUEST_CODE_SIZE     64
 #define MAX_PARAM_SIZE         6
 using namespace std;
 
-struct VM_Request {
+struct VRequest {
     char        code[REQUEST_CODE_SIZE];
     double      params[MAX_PARAM_SIZE];
 
-    VM_Request() {
+    VRequest() {
         *code   = '0';// default event is "0"
         code[1] = 0;
     }
-    VM_Request(char* str) {
+    VRequest(char* str) {
         strncpy(code, str, REQUEST_CODE_SIZE - 1);
     }
-    VM_Request(string& str) {
+    VRequest(string& str) {
         strncpy(code, str.data(), REQUEST_CODE_SIZE - 1);
     }
-    VM_Request(VM_Request& a) { // copy constructor
+    VRequest(VRequest& a) { // copy constructor
         memcpy(code, a.code, REQUEST_CODE_SIZE);
         memcpy(params, a.params, MAX_PARAM_SIZE * sizeof(double));
     }
 
-    VM_Request(VM_Request&& a) { // move constructor
+    VRequest(VRequest&& a) { // move constructor
         int i = 0;
         while(a.code[i]) {
             code[i] = a.code[i];
@@ -56,11 +56,11 @@ struct VM_Request {
         code[i] = 0;
     }
 
-    bool operator==(VM_Request &b) {
+    bool operator==(VRequest &b) {
         return strcmp(code, b.code) == 0;
     }
 };
 
-void loadRequests(char* fName, L1List<VM_Request> &);
+void loadRequests(char* fName, L1List<VRequest> &rList);
 
-#endif //DSA171A2_REQUESTLIB_H
+#endif //A02_REQUESTLIB_H

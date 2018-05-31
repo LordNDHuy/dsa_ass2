@@ -4,19 +4,21 @@
  * Author      : Duc Dung Nguyen
  * Email       : nddung@hcmut.edu.vn
  * Copyright   : Faculty of Computer Science and Engineering - Bach Khoa University
- * Description : library for Assignment 2 - Data structures and Algorithms - Fall 2017
+ * Description : Library for Assignment 2 - Data structures and Algorithms - Spring 2018
  *               This library contains functions used for database management
  * =========================================================================================
  */
 
-#ifndef DSA171A2_DBLIB_H
-#define DSA171A2_DBLIB_H
+#ifndef A02_DBLIB_H
+#define A02_DBLIB_H
 
-#include <string>
 #include <string.h>
 #include <time.h>
 #include <iostream>
 #include <iomanip>
+#include <fstream>
+#include <string>
+#include <sstream>
 #include <functional>
 
 #include "dsaLib.h"
@@ -26,42 +28,45 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
+#define VDB_HEADER_TEXT     "VRecord data"
+#define VDB_HEADER_SIZE     12
+
 #define ID_MAX_LENGTH   16
 
-struct VM_Record {
+struct VRecord {
     char    id[ID_MAX_LENGTH];
     time_t  timestamp;
-    double  longitude, latitude;
+    double  x, y;
 
-    // default constructor
-    VM_Record() {
+    VRecord() {// default constructor
         id[0] = 0;
     }
-    VM_Record(const char* busID) {
-        strcpy(id, busID);
+    VRecord(const char* vID) {
+        strcpy(id, vID);
     }
-    // copy constructor
-    VM_Record(VM_Record& bus) : timestamp(bus.timestamp), longitude(bus.longitude), latitude(bus.latitude) {
-        strcpy(id, bus.id);
+    VRecord(VRecord& vR) : timestamp(vR.timestamp),
+                           x(vR.x), y(vR.y) {
+        strcpy(id, vR.id);
+    }
+    VRecord(VRecord&& vR): timestamp(vR.timestamp),
+                           x(vR.x), y(vR.y) {
+        strcpy(id, vR.id);
+    }
+
+    bool operator==(VRecord& b) {
+        return  strcmp(id, b.id) == 0 &&
+                timestamp == b.timestamp;
     }
 };
 
-void    printVMRecord(VM_Record &);
+void    printVRecord(VRecord& vR);
 void    strPrintTime(char* des, time_t& t);
-bool    parseVMRecord(char*, VM_Record &);
-void    loadVMDB(char*, L1List<VM_Record> &);
-double  distanceEarth(double lat1d, double lon1d, double lat2d, double lon2d);
+void    loadVDB(char* fName, L1List<VRecord> &db);
 
-bool processRequest(VM_Request &, L1List<VM_Record> &, void *);// from processData.cpp
+#define __deg2rad(deg) (deg * pi / 180.0)
+#define __rad2deg(rad) (rad * 180.0 / pi)
 
-/// NOTE: student may create this function to allocate some global data
-bool initVMGlobalData(void** pGData);
-/// NOTE: student must defined this function if they use dynamically allocated global data.
-/// If student do not use any dynamic global data, please define this function as empty function
-/// in your code (file processData.cpp) as follows
-/// void releaseBusGlobalData() {}
-void releaseVMGlobalData(void* pGData);
+double  distanceVR(double lat1d, double lon1d, double lat2d, double lon2d);
 
-void process(L1List<VM_Request>& requestList, L1List<VM_Record>& recordList);
 
-#endif //DSA171A2_DBLIB_H
+#endif //A02_DBLIB_H

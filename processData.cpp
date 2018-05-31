@@ -1,36 +1,29 @@
 /*
- * ==========================================================================================
+ * =========================================================================================
  * Name        : processData.cpp
- * Description : student code for Assignment 2 - Data structures and Algorithms - Fall 2017
- * ==========================================================================================
+ * Description : Student code for Assignment 2 - Data structures and Algorithms - Spring 2018
+ * =========================================================================================
  */
-#include <iostream>
-#include <vector>
-#include <functional>
-#include <math.h>
 #include "requestLib.h"
 #include "dbLib.h"
 
-using namespace std;
+/// Initialize and Finalize any global data that you use in the program
 
-#define GPS_DISTANCE_ERROR 0.005
-
-
-bool initVMGlobalData(void** pGData) {
-    // TODO: allocate and initialize global data
-    // return false if failed
+bool initVGlobalData(void** pGData) {
+    // TODO: allocate global data if you think it is necessary.
+    /// pGData contains the address of a pointer. You should allocate data for the global data
+    /// and then assign its address to *pGData
     return true;
 }
-
-void releaseVMGlobalData(void* pGData) {
-    // TODO: do your cleanup, left this empty if you don't have any dynamically allocated data
-
+void releaseVGlobalData(void* pGData) {
+    // TODO: release the data if you finish using it
 }
 
-bool processRequest(VM_Request &request, L1List<VM_Record> &recordList, void *pGData) {
-    // TODO: Your code goes here
-    // return false for invlaid events
+bool processRequest(VRequest& request, L1List<VRecord>& recList, void* pGData) {
+    // TODO: Your code comes here
+
+    /// NOTE: The output of the request will be printed on one line
+    /// end by the end-line '\n' character.
     return true;
 }
-
 
