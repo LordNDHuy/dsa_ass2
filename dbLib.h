@@ -20,7 +20,7 @@
 #include <string>
 #include <sstream>
 #include <functional>
-
+#include <cmath>
 #include "dsaLib.h"
 #include "requestLib.h"
 

@@ -1,0 +1,3 @@
+/home/huynguyen/cpp/datastructure and algorithm/ass2/CMakeFiles/rebuild_cache.dir
+/home/huynguyen/cpp/datastructure and algorithm/ass2/CMakeFiles/dsa172a2.dir
+/home/huynguyen/cpp/datastructure and algorithm/ass2/CMakeFiles/edit_cache.dir

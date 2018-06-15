@@ -1,0 +1,1 @@
+/usr/bin/c++   -std=c++11 -g   -rdynamic CMakeFiles/dsa172a2.dir/main.cpp.o CMakeFiles/dsa172a2.dir/requestLib.cpp.o CMakeFiles/dsa172a2.dir/dbLib.cpp.o CMakeFiles/dsa172a2.dir/processData.cpp.o  -o dsa172a2 
