@@ -12,9 +12,13 @@ bool avlCreated;
 AVLTree<L1List<VRecord>> * recordData;
 
 bool doubleCmp(double x, double y){
-    unsigned long long int a = (unsigned long long int)(x*(10e13));
-    unsigned long long int b = (unsigned long long int)(y*(10e13));
-    if(a <= b) return true;
+    //unsigned long long int a = (unsigned long long int)(x*(10e13));
+    //unsigned long long int b = (unsigned long long int)(y*(10e13));
+    //if(a <= b) return true;
+    //else return false;
+    double diff = x - y;
+    if(fabs(diff) < 1e-13) return true;
+    else if(x < y)return true;
     else return false;
 }
 //request shortened compare method 
@@ -24,6 +28,7 @@ int eqCmp(L1List<VRecord> & a, L1List<VRecord> & b){
     else if(strcmp((a)[0].id,(b)[0].id) < 0) return -1;
     else return 0;
 }
+
 
 //request processing function
 enum requestCode{
@@ -58,7 +63,9 @@ requestCode switchCase(std::string input){
 
 
 bool reqCmp(double para[REQUEST_CODE_SIZE], VRecord &currentRec){
-    //return doubleCmp(distanceVR(currentRec.x,currentRec.y,para[1],para[0]), distanceVR(currentRec.x,currentRec.y,currentRec.x + para[3], currentRec.y + para[2]));
+    //return doubleCmp(distanceVR(currentRec.x,currentRec.y,para[1],para[0]),distanceVR(currentRec.x,currentRec.y,currentRec.x + para[3], currentRec.y + para[2]));
+        //return doubleCmp(distanceVR(currentRec.x,currentRec.y,para[1],para[0]), 
+        //distanceVR(para[1],para[0],para[1] + para[3], para[0] + para[2]));
     bool x = doubleCmp(para[1] - para[3], currentRec.x) && doubleCmp(currentRec.x, para[1] + para[3]);
     bool y = doubleCmp(para[0] - para[2], currentRec.y) && doubleCmp(currentRec.y, para[0] + para[2]);
     return x && y;
@@ -73,6 +80,7 @@ void NVR(double para[MAX_PARAM_SIZE],L1List<VRecord> * recList);
 void NRR(double para[MAX_PARAM_SIZE],L1List<VRecord> * recList);
 void CVP(double para[MAX_PARAM_SIZE],L1List<VRecord> * &recList);
 void NRP(double para[MAX_PARAM_SIZE],L1List<VRecord> * &recList);
+
 
 bool initVGlobalData(void** pGData) {
     // TODO: allocate global data if you think it is necessary.
@@ -97,7 +105,7 @@ bool processRequest(VRequest& request, L1List<VRecord>& recList, void* pGData) {
         VRecord curRec;
         recList.initCur();
         while(recList.current(curRec)){
-            std::cout<< curRec.x << "   "<< curRec.y<< "\n";
+            //std::cout<< curRec.y << "\n";
             L1List<VRecord> * id, *currentRec = new L1List<VRecord>();
             currentRec->insertHead(curRec);
             if(recordData->find(*currentRec,id,&eqCmp)){
@@ -108,7 +116,7 @@ bool processRequest(VRequest& request, L1List<VRecord>& recList, void* pGData) {
         }
         recList.resetCur();
         ::avlCreated = true;
-        std::cout<<"\n\n\n";
+        //std::cout<<"\n\n\n";
     }
     
     char requestStr[REQUEST_CODE_SIZE+1];
@@ -249,7 +257,6 @@ void NPR(double para[MAX_PARAM_SIZE],L1List<VRecord> * &recordList){
     recordList->initCur();
     VRecord currentRec;
     int number = 0, pre = 0, cur = 0;
-    AVLTree<std::string> * idTree = new  AVLTree<std::string>();
     while(recordList->current(currentRec)){
         std::string curId(currentRec.id), * ret;
         if(reqCmp(para, currentRec)){
@@ -291,15 +298,44 @@ int NVRCmp(std::string & a, std::string &b){
     recordList->resetCur();
     std::cout<< "NVR "<<para[0]<<" "<<para[1]<<" "<<para[2]<<" "<<para[3]<<": " << number<<"\n";
 }*/
+int CVPNum;
 
-bool NVR_(double para[MAX_PARAM_SIZE],L1List<VRecord> * &recordList){
+
+bool CVP_(double para[MAX_PARAM_SIZE],L1List<VRecord> * recordList){
+    bool found  = false;
     recordList->initCur();
     VRecord currentRec;
-    int number = 0;
+    if(recordList->getSize() < 2){
+        std::cout << 0<<'\n';
+        return false;
+    }  
+    while(recordList->current(currentRec)){
+        
+        if(reqCmp(para, currentRec)){//R - Delta_y <= P_y <= R + Delta_y
+            std::cout<< 1<< "\n";
+            found = true;
+            return true;
+            break;
+
+        }
+    }
+    std::cout<< 0<< "\n";
+    recordList->resetCur();
+    return false;
+}
+
+void CVP_traverse(double para[MAX_PARAM_SIZE], L1List<VRecord> &recordList ){
+    if(CVP_(para, &recordList) ) ::CVPNum++;
+}
+
+int NVR_(double para[MAX_PARAM_SIZE],L1List<VRecord> * recordList){
+    recordList->initCur();
+    VRecord currentRec;
+    /*int number = 0;
     bool prepre = true, pre = true, cur = true;
+    
     if(recordList->getSize() < 3) return false;
     while(recordList->current(currentRec)){
-        std::cout << " x: "<<para[1] - para[3]<<" < "<< currentRec.x <<" < "<<para[1] + para[3]<< "   y:  "<<para[0] - para[2]<< " < "<< currentRec.y<<" < "<< para[0] + para[2]<<std::endl;
         if(reqCmp(para, currentRec)){
             if(cur == false){
                 prepre = pre;
@@ -310,16 +346,47 @@ bool NVR_(double para[MAX_PARAM_SIZE],L1List<VRecord> * &recordList){
             prepre = pre;
             pre = cur;
             cur = false;
-            if(!prepre && pre && !cur) return true;//number++;
+            if(!prepre && pre && !cur){
+                number++;
+            }
+        }
+    }*/
+    //if(recordList->getSize() < 2) return 0;
+    int number = 0, pre , cur ;
+    if(recordList->current(currentRec)){
+        if(reqCmp(para, currentRec)){ pre = 1; cur = 1;}
+        else{ pre = 0 ; cur = 0;}
+    }
+    while(recordList->current(currentRec)){
+        std::string curId(currentRec.id), * ret;
+        if(reqCmp(para, currentRec)){
+            if(cur == 0){
+                pre = cur;
+                cur = 1;
+            }
+        }else{
+            pre = cur;
+            cur = 0;
+            if(pre == 1 && cur == 0) number++;
+
         }
     }
-    return false;
+    if(cur == 1 && pre == 0) number++;
+    return number;
+}
+
+int NVRNum;
+void NVR_traverse(double para[MAX_PARAM_SIZE], L1List<VRecord> &recordList ){
+    if(NVR_(para, &recordList) ) ::NVRNum++;
 }
 void NVR(double para[MAX_PARAM_SIZE],L1List<VRecord> * recordList){
     recordList->initCur();
     VRecord currentRec;
     int number = 0;
-    AVLTree<std::string> * idTree = new  AVLTree<std::string>();
+    ::NVRNum = 0;
+    ::CVPNum = 0;
+    /*AVLTree<std::string> * idTree = new  AVLTree<std::string>();
+    int cnt= 0;
     while(recordList->current(currentRec)){
         std::string curId(currentRec.id), * ret;
         if(!(idTree->find(curId, ret, &NVRCmp))){
@@ -329,21 +396,31 @@ void NVR(double para[MAX_PARAM_SIZE],L1List<VRecord> * recordList){
             strcpy(rec.id, curId.c_str());
             find->insertHead(rec);
             recordData->find(*find, id, &eqCmp);
-            std::cout <<number<<": "<< curId<< "\n";
-            if(!NVR_(para, id)){ 
+            //std::cout <<number<<": "<< curId<< "\n";
+            if(NVR_(para, id)){ 
                 number++;
             }
+            cnt++;
         }
     }
     recordList->resetCur();
-    std::cout<< "NVR "<<para[0]<<" "<<para[1]<<" "<<para[2]<<" "<<para[3]<<": " << number<<"\n";
+    */
+   
+    recordData->traverseNLR(para, &NVR_traverse);
+    std::cout<< "NVR "<<para[0]<<" "<<para[1]<<" "<<para[2]<<" "<<para[3]<<": " << ::NVRNum<<" "<<"\n";
 }
 
 void NRR(double para[MAX_PARAM_SIZE],L1List<VRecord> * recordList){
     recordList->initCur();
     VRecord currentRec;
+    int cnt = 0;
     int number = 0;
     while(recordList->current(currentRec)){
+        cnt++;
+        //std::cout << cnt << " x: "<<para[1] - para[3]<<" < "<< currentRec.x <<" < "<<para[1] + para[3]<<
+          //           "   y:  "<<para[0] - para[2]<< " < "<< currentRec.y<<" < "<< para[0] + para[2];
+        //std::cout << distanceVR(currentRec.x,currentRec.y,para[1],para[0])<<"   <   "
+          //      << distanceVR(currentRec.x,currentRec.y,currentRec.x + para[3], currentRec.y + para[2]);
         if(reqCmp(para, currentRec)){//R - Delta_y <= P_y <= R + Delta_y
             number++;
         }

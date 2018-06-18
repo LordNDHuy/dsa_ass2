@@ -3,6 +3,7 @@
 #include "dsaLib.h"
 #include "requestLib.h"
 #include "dbLib.h"
+#include <ctime>
 
 using namespace std;
 
@@ -11,6 +12,7 @@ bool initVGlobalData(void** pGData);
 void releaseVGlobalData(void* pGData);
 
 int main(int narg, char** argv) {
+      clock_t begin = clock();
     L1List<VRequest>  reqList;
     L1List<VRecord>   recDB;// database of records
     void*             pGData;
@@ -37,5 +39,8 @@ int main(int narg, char** argv) {
     cout << resetiosflags(ios::showbase) << setprecision(-1);
     /// Release any global allocaed data
     releaseVGlobalData(pGData);
+    clock_t end = clock();
+    double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+    std::cout << "timelapsed = "<< elapsed_secs<<"\nXD";
     return 0;
 }

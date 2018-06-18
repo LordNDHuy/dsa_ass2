@@ -462,6 +462,8 @@ public:
     void traverseNLR(void (*op)(T&)) { traverseNLR(_pRoot, op); }
     void traverseLNR(void (*op)(T&)) { traverseLNR(_pRoot, op); }
     void traverseLRN(void (*op)(T&)) { traverseLRN(_pRoot, op); }
+    
+    void traverseNLR(double para[6],void (*op)(double[6], T&)) { traverseNLR(_pRoot,para, op); }
 protected:
     void destroy(AVLNode<T>* &pR);
     bool find(AVLNode<T> *pR, T& key, T* &ret);
@@ -470,6 +472,8 @@ protected:
     void traverseNLR(AVLNode<T> *pR, void (*op)(T&));
     void traverseLNR(AVLNode<T> *pR, void (*op)(T&));
     void traverseLRN(AVLNode<T> *pR, void (*op)(T&));
+//
+    void traverseNLR(AVLNode<T> *pR,double para[6], void (*op)(double[6],T&));
 
     void rotLeft(AVLNode<T>* &pR);
     void rotRight(AVLNode<T>* &pR);
@@ -764,6 +768,15 @@ bool AVLTree<T>::remove(AVLNode<T>* &pR, T& key){
         pR = pRep;
     }
     return taller;
+}
+//
+template <class T>
+void AVLTree<T>::traverseNLR(AVLNode<T> *pR,double para[6], void (*op)(double[6], T&)){
+    if(pR != NULL){
+        op(para, pR->_data);
+        traverseNLR(pR->_pLeft,para, op);
+        traverseNLR(pR->_pRight,para, op);
+    }
 }
 
 template <class T>
