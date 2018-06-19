@@ -281,78 +281,11 @@ int NVRCmp(std::string & a, std::string &b){
     else return 0;
 }
 
-/*void NVR(double para[MAX_PARAM_SIZE],L1List<VRecord> * recordList){
+bool NVR_(double para[MAX_PARAM_SIZE],L1List<VRecord> * recordList){
     recordList->initCur();
     VRecord currentRec;
-    int number = 0;
-    AVLTree<std::string> * idTree = new  AVLTree<std::string>();
-    while(recordList->current(currentRec)){
-        std::string curId(currentRec.id), * ret;
-        if(reqCmp(para, currentRec)){
-            if(!(idTree->find(curId, ret, &NVRCmp))){
-                idTree->insert(curId, &NVRCmp);
-                number++;
-            }
-        }
-    }
-    recordList->resetCur();
-    std::cout<< "NVR "<<para[0]<<" "<<para[1]<<" "<<para[2]<<" "<<para[3]<<": " << number<<"\n";
-}*/
-int CVPNum;
-
-
-bool CVP_(double para[MAX_PARAM_SIZE],L1List<VRecord> * recordList){
-    bool found  = false;
-    recordList->initCur();
-    VRecord currentRec;
-    if(recordList->getSize() < 2){
-        std::cout << 0<<'\n';
-        return false;
-    }  
-    while(recordList->current(currentRec)){
-        
-        if(reqCmp(para, currentRec)){//R - Delta_y <= P_y <= R + Delta_y
-            std::cout<< 1<< "\n";
-            found = true;
-            return true;
-            break;
-
-        }
-    }
-    std::cout<< 0<< "\n";
-    recordList->resetCur();
-    return false;
-}
-
-void CVP_traverse(double para[MAX_PARAM_SIZE], L1List<VRecord> &recordList ){
-    if(CVP_(para, &recordList) ) ::CVPNum++;
-}
-
-int NVR_(double para[MAX_PARAM_SIZE],L1List<VRecord> * recordList){
-    recordList->initCur();
-    VRecord currentRec;
-    /*int number = 0;
-    bool prepre = true, pre = true, cur = true;
     
-    if(recordList->getSize() < 3) return false;
-    while(recordList->current(currentRec)){
-        if(reqCmp(para, currentRec)){
-            if(cur == false){
-                prepre = pre;
-                pre = cur;
-                cur = true;
-            }
-        }else{
-            prepre = pre;
-            pre = cur;
-            cur = false;
-            if(!prepre && pre && !cur){
-                number++;
-            }
-        }
-    }*/
-    //if(recordList->getSize() < 2) return 0;
-    int number = 0, pre , cur ;
+    /*int number = 0, pre , cur ;
     if(recordList->current(currentRec)){
         if(reqCmp(para, currentRec)){ pre = 1; cur = 1;}
         else{ pre = 0 ; cur = 0;}
@@ -371,43 +304,39 @@ int NVR_(double para[MAX_PARAM_SIZE],L1List<VRecord> * recordList){
 
         }
     }
-    if(cur == 1 && pre == 0) number++;
-    return number;
+    if(cur == 1 && pre == 0) number++;*/
+    while(recordList->current(currentRec)){
+        if(reqCmp(para, currentRec)) return true;
+    }
+    return false;
 }
 
 int NVRNum;
 void NVR_traverse(double para[MAX_PARAM_SIZE], L1List<VRecord> &recordList ){
-    if(NVR_(para, &recordList) ) ::NVRNum++;
+    if(NVR_(para, &recordList)) ::NVRNum++;
 }
+
 void NVR(double para[MAX_PARAM_SIZE],L1List<VRecord> * recordList){
     recordList->initCur();
     VRecord currentRec;
     int number = 0;
-    ::NVRNum = 0;
-    ::CVPNum = 0;
-    /*AVLTree<std::string> * idTree = new  AVLTree<std::string>();
-    int cnt= 0;
+    ::NVRNum = 0;//traverse method
+    
+    AVLTree<std::string> * idTree = new  AVLTree<std::string>();
     while(recordList->current(currentRec)){
-        std::string curId(currentRec.id), * ret;
-        if(!(idTree->find(curId, ret, &NVRCmp))){
-            idTree->insert(curId, &NVRCmp);
-            L1List<VRecord> * find = new L1List<VRecord>(), *id;
-            VRecord rec;
-            strcpy(rec.id, curId.c_str());
-            find->insertHead(rec);
-            recordData->find(*find, id, &eqCmp);
-            //std::cout <<number<<": "<< curId<< "\n";
-            if(NVR_(para, id)){ 
+        if(reqCmp(para, currentRec)){
+            std::string curId(currentRec.id), * ret;
+            if(!(idTree->find(curId, ret, &NVRCmp))){
+                idTree->insert(curId, &NVRCmp);
                 number++;
             }
-            cnt++;
         }
     }
     recordList->resetCur();
-    */
+    
    
-    recordData->traverseNLR(para, &NVR_traverse);
-    std::cout<< "NVR "<<para[0]<<" "<<para[1]<<" "<<para[2]<<" "<<para[3]<<": " << ::NVRNum<<" "<<"\n";
+    //recordData->traverseNLR(para, &NVR_traverse);
+    std::cout<< "NVR "<<para[0]<<" "<<para[1]<<" "<<para[2]<<" "<<para[3]<<": " << number<<" "<<"\n";
 }
 
 void NRR(double para[MAX_PARAM_SIZE],L1List<VRecord> * recordList){
@@ -416,12 +345,7 @@ void NRR(double para[MAX_PARAM_SIZE],L1List<VRecord> * recordList){
     int cnt = 0;
     int number = 0;
     while(recordList->current(currentRec)){
-        cnt++;
-        //std::cout << cnt << " x: "<<para[1] - para[3]<<" < "<< currentRec.x <<" < "<<para[1] + para[3]<<
-          //           "   y:  "<<para[0] - para[2]<< " < "<< currentRec.y<<" < "<< para[0] + para[2];
-        //std::cout << distanceVR(currentRec.x,currentRec.y,para[1],para[0])<<"   <   "
-          //      << distanceVR(currentRec.x,currentRec.y,currentRec.x + para[3], currentRec.y + para[2]);
-        if(reqCmp(para, currentRec)){//R - Delta_y <= P_y <= R + Delta_y
+       if(reqCmp(para, currentRec)){//R - Delta_y <= P_y <= R + Delta_y
             number++;
         }
     }
