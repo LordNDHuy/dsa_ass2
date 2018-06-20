@@ -118,7 +118,6 @@ bool processRequest(VRequest& request, L1List<VRecord>& recList, void* pGData) {
         ::avlCreated = true;
         //std::cout<<"\n\n\n";
     }
-    
     char requestStr[REQUEST_CODE_SIZE+1];
     strcpy(requestStr,request.code);
     for(int i = 0; i < REQUEST_CODE_SIZE; i++){
@@ -127,43 +126,46 @@ bool processRequest(VRequest& request, L1List<VRecord>& recList, void* pGData) {
     //get parameters and id and request
     std::stringstream ss(requestStr);
     char id[ID_MAX_LENGTH];
+    L1List<VRecord> * avlFind;
     char token[5];
-    L1List<VRecord> * avlFind = new L1List<VRecord>(),*findRet;
+    
     ss >> token;
     if(strcmp(token, "NVR") == 0 || strcmp(token,"NRR") == 0){
         ss >> request.params[0] >> request.params[1] >>request.params[2] >> request.params[3] ;
-    }{
-        ss >> id >> request.params[0] >> request.params[1] >>request.params[2] >> request.params[3] ;
-        //get the linkedlist of id
+    }else{
         VRecord find;
-        strcpy(find.id,id);
-
+        ss >> find.id >> request.params[0] >> request.params[1] >>request.params[2] >> request.params[3] ;
+        //get the linkedlist of id
+        //findRet = 0x0;
+        avlFind = new L1List<VRecord>();
         avlFind->insertHead(find);
-        recordData->find(*avlFind,findRet,&eqCmp);
+        recordData->find(*avlFind,avlFind,&eqCmp);
+        //strcpy(find.id,id);
     }
+    
     switch(switchCase(token)){
         case _CYR:{
-            //RY DY at params[0] an params[1]
-            CYR(request.params,findRet);
+            //RY DY at params[0] an params[1            
+            CYR(request.params,avlFind);
             break;
         }
         case _CXR:{
             //RX DX at params[0] an params[1]
-            CXR(request.params,findRet);
+            CXR(request.params,avlFind);
             break;
         }
         case _NYR:{
             //RY DY at params[0] an params[1]  
-            NYR(request.params,findRet);
+            NYR(request.params,avlFind);
             break;
         }
         case _NXR:{
             //RX DX at params[0] an params[1]  
-            NXR(request.params,findRet); 
+            NXR(request.params,avlFind); 
             break;
         }
         case _NPR:{
-            NPR(request.params,findRet);
+            NPR(request.params,avlFind);
             break;
         }
         case _NVR:{
@@ -172,20 +174,20 @@ bool processRequest(VRequest& request, L1List<VRecord>& recList, void* pGData) {
         }
         case _NRR:{
             NRR(request.params,(&recList));
-            break;
+            return true;
         }
         case _NRP:{
-            NRP(request.params,findRet);
+            NRP(request.params,avlFind);
             break;
         }
         case _CVP:{
-            CVP(request.params,findRet);
+            CVP(request.params,avlFind);
             break;
         }
         default: return false; break;
     }
-    
     return true;
+
 }   
 void CYR(double para[MAX_PARAM_SIZE],L1List<VRecord> * &recordList){
     bool found  = false;
@@ -305,6 +307,8 @@ bool NVR_(double para[MAX_PARAM_SIZE],L1List<VRecord> * recordList){
         }
     }
     if(cur == 1 && pre == 0) number++;*/
+    
+
     while(recordList->current(currentRec)){
         if(reqCmp(para, currentRec)) return true;
     }
@@ -321,7 +325,7 @@ void NVR(double para[MAX_PARAM_SIZE],L1List<VRecord> * recordList){
     VRecord currentRec;
     int number = 0;
     ::NVRNum = 0;//traverse method
-    
+    /*
     AVLTree<std::string> * idTree = new  AVLTree<std::string>();
     while(recordList->current(currentRec)){
         if(reqCmp(para, currentRec)){
@@ -332,11 +336,10 @@ void NVR(double para[MAX_PARAM_SIZE],L1List<VRecord> * recordList){
             }
         }
     }
-    recordList->resetCur();
+    recordList->resetCur();*/
     
-   
-    //recordData->traverseNLR(para, &NVR_traverse);
-    std::cout<< "NVR "<<para[0]<<" "<<para[1]<<" "<<para[2]<<" "<<para[3]<<": " << number<<" "<<"\n";
+    recordData->traverseNLR(para, &NVR_traverse);
+    std::cout<< "NVR "<<para[0]<<" "<<para[1]<<" "<<para[2]<<" "<<para[3]<<": " << ::NVRNum<<" "<<"\n";
 }
 
 void NRR(double para[MAX_PARAM_SIZE],L1List<VRecord> * recordList){
